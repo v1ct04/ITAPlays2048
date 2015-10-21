@@ -15,5 +15,12 @@ app.get('/', function(req, res) {
   res.sendFile(path.join(staticdir, 'index.html'));
 });
 
-app.listen(port);
-console.log('Listening on port ' + port + '.');
+var http = require('http').Server(app);
+var socket2048 = require('./socket2048.js')(http);
+var core2048 = require('./core2048.js');
+
+http.listen(port, function() {
+  console.log('Listening on port ' + port + '.');
+
+  new core2048.GameManager(4, socket2048.inputManager, socket2048.actuator, socket2048.storageManager);
+});

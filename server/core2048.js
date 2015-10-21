@@ -16,6 +16,12 @@ execFile('grid.js', sandbox);
 execFile('game_manager.js', sandbox);
 
 exports.Tile = sandbox.Tile;
+
+var oldInsertTile = sandbox.Grid.prototype.insertTile;
+sandbox.Grid.prototype.insertTile = function(tile) {
+  oldInsertTile.apply(this, arguments);
+  this.lastInsertedTile = tile;
+}
 exports.Grid = sandbox.Grid;
 
 function createDummyClass() {
