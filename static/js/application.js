@@ -45,5 +45,8 @@ remoteStorage.onReady(function(s) {
     keyboardInput.on('keepPlaying', function() {
       socket.emit('keepPlaying');
     });
+    keyboardInput.on('chatMessage', function(msg) {
+      socket.emit('chatMessage', msg);
+    });
   })
 });
