@@ -102,8 +102,35 @@ h1.title {
 .best-container:after {
   content: "Best"; }
 
-.chat-header {
-  color: #776e65;
+.btn-info {
+  background-color: #bbada0;
+  border-color: #bbada0;
+  color: white;
+}
+
+.btn-info:hover {
+  background-color: #8f7a66;
+  border-color: #8f7a66;
+  color: #f9f6f2;
+}
+
+.btn-info:focus {
+  background-color: #8f7a66;
+  border-color: #8f7a66;
+  color: #f9f6f2;
+}
+
+.panel-info {
+  border-color: #bbada0;
+}
+
+.panel-info > .panel-heading {
+  /*background-color: #8f7a66;
+  border-color: #8f7a66;
+  color: #776e65;*/
+  color: white;
+  background-color: #bbada0;
+  border-color: #bbada0;
 }
 
 .panel-height{
@@ -113,6 +140,7 @@ h1.title {
 }
 
 .message{
+  height: 100%;
   overflow: scroll;
 }
 
