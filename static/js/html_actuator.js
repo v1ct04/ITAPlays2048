@@ -142,11 +142,15 @@ HTMLActuator.prototype.addChatMessage = function(data) {
   var m = JSON.parse(data);
   var message = document.createElement("li");
   message.setAttribute('class','media-list message');
+  var span = document.createElement("span");
   if (m.username) {
-    var username = document.createElement("span");
-    username.appendChild(document.createTextNode(m.username + ": "));
-    message.appendChild(username);   
+    span.appendChild(document.createTextNode(m.username + ": "));
+    message.appendChild(span);   
+    message.appendChild(document.createTextNode(m.msg));
+  } else { //message from server
+    span.style.color = "black";
+    span.appendChild(document.createTextNode(m.msg));
+    message.appendChild(span);
   }
-  message.appendChild(document.createTextNode(m.msg));
   this.chatContainer.appendChild(message);
 }
