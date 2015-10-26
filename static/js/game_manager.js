@@ -9,9 +9,14 @@ function GameManager(size, InputManager, Actuator, StorageManager) {
   this.inputManager.on("move", this.move.bind(this));
   this.inputManager.on("restart", this.restart.bind(this));
   this.inputManager.on("keepPlaying", this.keepPlaying.bind(this));
-
+  this.inputManager.on("chatMessage", this.chatMessage.bind(this));
   this.setup();
 }
+
+// Chat Message
+GameManager.prototype.chatMessage = function (data) {
+  this.actuator.addChatMessage(data);
+};
 
 // Restart the game
 GameManager.prototype.restart = function () {
@@ -76,7 +81,7 @@ GameManager.prototype.addRandomTile = function () {
 };
 
 // Sends the updated grid to the actuator
-GameManager.prototype.actuate = function () {
+GameManager.prototype.actuate = function (direction) {
   if (this.storageManager.getBestScore() < this.score) {
     this.storageManager.setBestScore(this.score);
   }
@@ -93,7 +98,8 @@ GameManager.prototype.actuate = function () {
     over:       this.over,
     won:        this.won,
     bestScore:  this.storageManager.getBestScore(),
-    terminated: this.isGameTerminated()
+    terminated: this.isGameTerminated(),
+    direction: direction,
   });
 
 };
@@ -186,7 +192,7 @@ GameManager.prototype.move = function (direction) {
       this.over = true; // Game over!
     }
 
-    this.actuate();
+    this.actuate(direction);
   }
 };
 
