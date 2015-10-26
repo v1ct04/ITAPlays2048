@@ -137,6 +137,7 @@ h1.title {
   min-height: 500px;
   max-height: 500px;
   overflow: scroll;
+  background: rgba(238, 228, 218, 0.35);
 }
 
 .message{
