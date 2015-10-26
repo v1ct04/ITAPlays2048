@@ -39,14 +39,15 @@ KeyboardInputManager.prototype.listen = function () {
     39: 1, // Right
     40: 2, // Down
     37: 3, // Left
-    75: 0, // Vim up
-    76: 1, // Vim right
-    74: 2, // Vim down
-    72: 3, // Vim left
-    87: 0, // W
-    68: 1, // D
-    83: 2, // S
-    65: 3  // A
+    
+    // 75: 0, // Vim up
+    // 76: 1, // Vim right
+    // 74: 2, // Vim down
+    // 72: 3, // Vim left
+    // 87: 0, // W
+    // 68: 1, // D
+    // 83: 2, // S
+    // 65: 3  // A
   };
 
   // Respond to direction keys
@@ -62,9 +63,9 @@ KeyboardInputManager.prototype.listen = function () {
       }
     }
 
-    // R key restarts the game
-    if (!modifiers && event.which === 82) {
-      self.restart.call(self, event);
+    // Enter Key sends message from chat
+    if(!modifiers && event.which === 13) {
+      self.chatMessage.call(self, event);
     }
   });
 
@@ -72,6 +73,7 @@ KeyboardInputManager.prototype.listen = function () {
   this.bindButtonPress(".retry-button", this.restart);
   this.bindButtonPress(".restart-button", this.restart);
   this.bindButtonPress(".keep-playing-button", this.keepPlaying);
+  this.bindButtonPress(".chat-button", this.chatMessage);
 
   // Respond to swipe events
   var touchStartClientX, touchStartClientY;
@@ -127,6 +129,17 @@ KeyboardInputManager.prototype.listen = function () {
   });
 };
 
+
+KeyboardInputManager.prototype.chatMessage = function (event) {
+  event.preventDefault();
+  var input = document.querySelector(".input-message");
+  var msg = input.value;
+  if (msg !== "") {
+    input.value = "";
+    this.emit("chatMessage", msg);    
+  }  
+};
+
 KeyboardInputManager.prototype.restart = function (event) {
   event.preventDefault();
   this.emit("restart");
@@ -136,6 +149,7 @@ KeyboardInputManager.prototype.keepPlaying = function (event) {
   event.preventDefault();
   this.emit("keepPlaying");
 };
+
 
 KeyboardInputManager.prototype.bindButtonPress = function (selector, fn) {
   var button = document.querySelector(selector);

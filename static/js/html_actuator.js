@@ -3,7 +3,7 @@ function HTMLActuator() {
   this.scoreContainer   = document.querySelector(".score-container");
   this.bestContainer    = document.querySelector(".best-container");
   this.messageContainer = document.querySelector(".game-message");
-
+  this.chatContainer = document.querySelector(".media-list");
   this.score = 0;
 }
 
@@ -137,3 +137,16 @@ HTMLActuator.prototype.clearMessage = function () {
   this.messageContainer.classList.remove("game-won");
   this.messageContainer.classList.remove("game-over");
 };
+
+HTMLActuator.prototype.addChatMessage = function(data) {
+  var m = JSON.parse(data);
+  var message = document.createElement("li");
+  message.setAttribute('class','media-list message');
+  if (m.username) {
+    var username = document.createElement("span");
+    username.appendChild(document.createTextNode(m.username + ": "));
+    message.appendChild(username);   
+  }
+  message.appendChild(document.createTextNode(m.msg));
+  this.chatContainer.appendChild(message);
+}
