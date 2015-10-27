@@ -19,8 +19,12 @@ GameManager.prototype.chatMessage = function (data) {
 };
 
 // Restart the game
-GameManager.prototype.restart = function () {
+GameManager.prototype.restart = function (gameState) {
   this.storageManager.clearGameState();
+  if (gameState) {
+    // initial state has been explicitly provided
+    this.storageManager.setGameState(gameState);
+  }
   this.actuator.continueGame(); // Clear the game won/lost message
   this.setup();
 };
@@ -142,7 +146,7 @@ var Direction = Object.freeze({
 });
 
 // Move tiles on the grid in the specified direction
-GameManager.prototype.move = function (direction) {
+GameManager.prototype.move = function (direction, tileToAdd) {
   // 0: up, 1: right, 2: down, 3: left
   var self = this;
 
@@ -195,13 +199,17 @@ GameManager.prototype.move = function (direction) {
   });
 
   if (moved) {
-    var tile = this.addRandomTile();
+    if (tileToAdd) {
+      this.grid.insertTile(tileToAdd);
+    } else {
+      tileToAdd = this.addRandomTile();
+    }
 
     if (!this.movesAvailable()) {
       this.over = true; // Game over!
     }
 
-    this.actuate(direction, tile);
+    this.actuate(direction, tileToAdd);
   }
 };
 
