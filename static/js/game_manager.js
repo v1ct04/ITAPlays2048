@@ -77,11 +77,12 @@ GameManager.prototype.addRandomTile = function () {
     var tile = new Tile(this.grid.randomAvailableCell(), value);
 
     this.grid.insertTile(tile);
+    return tile;
   }
 };
 
 // Sends the updated grid to the actuator
-GameManager.prototype.actuate = function (direction) {
+GameManager.prototype.actuate = function (direction, addedTile) {
   if (this.storageManager.getBestScore() < this.score) {
     this.storageManager.setBestScore(this.score);
   }
@@ -99,7 +100,8 @@ GameManager.prototype.actuate = function (direction) {
     won:        this.won,
     bestScore:  this.storageManager.getBestScore(),
     terminated: this.isGameTerminated(),
-    direction: direction,
+    direction:  direction,
+    addedTile:  addedTile
   });
 
 };
@@ -131,6 +133,13 @@ GameManager.prototype.moveTile = function (tile, cell) {
   this.grid.cells[cell.x][cell.y] = tile;
   tile.updatePosition(cell);
 };
+
+var Direction = Object.freeze({
+  UP: 0,
+  RIGHT: 1,
+  DOWN: 2,
+  LEFT: 3
+});
 
 // Move tiles on the grid in the specified direction
 GameManager.prototype.move = function (direction) {
@@ -186,13 +195,13 @@ GameManager.prototype.move = function (direction) {
   });
 
   if (moved) {
-    this.addRandomTile();
+    var tile = this.addRandomTile();
 
     if (!this.movesAvailable()) {
       this.over = true; // Game over!
     }
 
-    this.actuate(direction);
+    this.actuate(direction, tile);
   }
 };
 
