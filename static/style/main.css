@@ -122,6 +122,7 @@ h1.title {
 
 .panel-info {
   border-color: #bbada0;
+  margin-top: 40px;
 }
 
 .panel-info > .panel-heading {
@@ -134,8 +135,8 @@ h1.title {
 }
 
 .panel-height{
-  min-height: 500px;
-  max-height: 500px;
+  min-height: 400px;
+  max-height: 400px;
   overflow: scroll;
   background: rgba(238, 228, 218, 0.35);
 }
@@ -166,7 +167,7 @@ hr {
   margin-bottom: 30px; }
 
 .custom-container {
-  width: 500px;
+  width: 550px;
   margin: 0 auto; }
 
 
