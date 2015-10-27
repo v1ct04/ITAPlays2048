@@ -85,9 +85,9 @@ SocketInputManager.prototype.onMove = function(socket, data) {
   }
 };
 SocketInputManager.prototype.onChatMessage = function(socket, msg) {
-  
+  var trimMsg = msg.trim().toLowerCase();
   //check if the message is a move command
-  switch (msg.toLowerCase()) {
+  switch (trimMsg) {
     case "up":
       this.eventEmitter.emit('move', core.Direction.UP);
       break;
@@ -102,25 +102,25 @@ SocketInputManager.prototype.onChatMessage = function(socket, msg) {
       break;
   }
 
-  //if message is in the format "nick new_username" to change username 
-  if(msg.toLowerCase().indexOf("nick") === 0) { //begins with nick
-    var strArray = msg.split(" ");
+  var data = null;
+  //if message is in the format "nick new_username" -> change username
+  if(trimMsg.indexOf("nick") === 0) { //begins with nick
+    var strArray = trimMsg.split(/\s+/);
     if (strArray.length === 2) {
       var newUsername = strArray[1];
-      var data = {
+      data = {
         msg: clientsMap.get(socket.id) + " changed username to " + newUsername,
       };
       changeUsername(socket, newUsername);
-      this.io.emit('chatMessage', JSON.stringify(data));
-    } 
-    
-  } else {
-    var data = {
+    }
+  }
+  if (!data) {
+    data = {
       msg: msg,
       username: clientsMap.get(socket.id),
     };
-    this.eventEmitter.emit('chatMessage', JSON.stringify(data));  
-  } 
+  }
+  this.eventEmitter.emit('chatMessage', JSON.stringify(data));
 };
 
 var MemoryStorageManager = function(io) {
