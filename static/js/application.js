@@ -1,29 +1,3 @@
-var oldAddRandomTile = GameManager.prototype.addRandomTile; 
-GameManager.prototype.addRandomTile = function() {
-  if (this.tileToAdd) {
-    this.grid.insertTile(this.tileToAdd);
-    this.tileToAdd = null;
-  } else {
-    oldAddRandomTile.apply(this, arguments);
-  }
-}
-var oldMove = GameManager.prototype.move;
-GameManager.prototype.move = function(dir, randomTile) {
-  if (randomTile) this.tileToAdd = randomTile;
-  oldMove.apply(this, arguments);
-}
-
-var oldRestart = GameManager.prototype.restart;
-GameManager.prototype.restart = function (gameState) {
-  if (gameState) {
-    this.storageManager.setGameState(gameState);
-  } else {
-    this.storageManager.clearGameState();
-  }
-  this.actuator.continueGame(); // Clear the game won/lost message
-  this.setup();
-};
-
 var socket = io();
 
 var remoteStorage = new RemoteStorageManager(socket);
