@@ -1,6 +1,9 @@
 var events = require('events');
 var core   = require('./core2048.js');
 
+var clientsMap = new Map();
+var usernames = new Set();
+
 var SocketInputManager = function(io) {
   this.io = io;
   this.eventEmitter = new events.EventEmitter();
@@ -10,9 +13,7 @@ var SocketInputManager = function(io) {
 SocketInputManager.prototype.on = function(evt, callback) {
   this.eventEmitter.on(evt, callback);
 }
-var clientsMap = new Map();
-var usernames = new Set();
-var restarted = false;
+
 SocketInputManager.prototype.listen = function(io) {
   var self = this;
   io.on('connection', function(socket) {
@@ -25,7 +26,6 @@ SocketInputManager.prototype.listen = function(io) {
       self.io.emit('keepPlaying');
     });
     socket.on('restart', function() {
-      restarted = true;
       self.eventEmitter.emit('restart');
     });
     socket.on('chatMessage', function(data){
@@ -112,7 +112,7 @@ SocketInputManager.prototype.onChatMessage = function(socket, msg) {
       };
       changeUsername(socket, newUsername);
       this.io.emit('chatMessage', JSON.stringify(data));
-    } 
+    }
     
   } else {
     var data = {
@@ -126,16 +126,15 @@ SocketInputManager.prototype.onChatMessage = function(socket, msg) {
 var MemoryStorageManager = function(io) {
   this.gameState = null;
   this.bestScore = 0;
+  this.io = io;
 
   this.listen(io);
 };
 
-var gameState;
 MemoryStorageManager.prototype = {
   getBestScore: function() {return this.bestScore;},
   setBestScore: function(score) {this.bestScore = score;},
   getGameState: function() {return this.gameState;},
-  setGameState: function(state) {gameState = this.gameState = state;},
   clearGameState: function() {this.gameState = null;}
 };
 
@@ -147,6 +146,15 @@ MemoryStorageManager.prototype.listen = function(io) {
   });
 };
 
+MemoryStorageManager.prototype.setGameState = function(state) {
+  if (this.gameState == null) {
+    // this means the state has just been cleared, this will happen when the
+    // game is restarted so broadcast the randomized initial state of the game
+    this.io.emit('restart', JSON.stringify(state));
+  }
+  this.gameState = state;
+};
+
 var Actuator = function(io) {
   this.io = io;
 }
@@ -155,12 +163,9 @@ Actuator.prototype.actuate = function(grid, metadata) {
   if (metadata.direction != null) {
     var data = {
         dir: metadata.direction,
-        tile: grid.lastInsertedTile.serialize()
+        tile: metadata.addedTile.serialize()
       };
     this.io.emit('move', JSON.stringify(data));
-  } 
-  else if(restarted) {
-    this.io.emit('restart', JSON.stringify(gameState));
   }
 }
 
