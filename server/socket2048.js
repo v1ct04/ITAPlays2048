@@ -87,7 +87,7 @@ SocketInputManager.prototype.onMove = function(socket, data) {
 SocketInputManager.prototype.onChatMessage = function(socket, msg) {
   var trimMsg = msg.trim().toLowerCase();
   //check if the message is a move command
-  switch (trimMsg) {
+  switch (trimMsg) {  
     case "up":
       this.eventEmitter.emit('move', core.Direction.UP);
       break;
@@ -101,7 +101,6 @@ SocketInputManager.prototype.onChatMessage = function(socket, msg) {
       this.eventEmitter.emit('move', core.Direction.RIGHT);
       break;
   }
-
   var data = null;
   //if message is in the format "nick new_username" -> change username
   if(trimMsg.indexOf("nick") === 0) { //begins with nick

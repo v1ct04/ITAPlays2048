@@ -7,7 +7,7 @@ function HTMLActuator() {
   this.chatContainer = document.querySelector(".chat-container");
   this.score = 0;
 
-  // ...
+  // set up the scroll toggle 
   var self = this;
   self.chatContainer.dataset.autoScroll = "true";
   self.chatContainer.addEventListener("scroll", function(evt) {
