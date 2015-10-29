@@ -1,16 +1,24 @@
 var core2048 = require('./core2048.js');
 var socket2048 = require('./socket2048');
 
-function Room(name, room_io) {
+function RoomIo(io, name) {
+  this.emit = function() {
+    var to_room = io.to(name);
+    to_room.emit.apply(to_room, arguments);
+  }
+}
+
+function Room(io, name) {
   this.name = name;
   this.sockets = new Set();
+  this.io = new RoomIo(io, name);
 
-  var args = socket2048(room_io);
+  var args = socket2048(this.io);
   this.game = new core2048.GameManager(4, args.inputManager, args.actuator, args.storageManager);
 }
 
 Room.prototype.isEmpty = function() {
-  return this.sockets.size() == 0;
+  return this.sockets.size === 0;
 }
 
 Room.prototype.tearDown = function() {
@@ -42,7 +50,7 @@ function RoomManager(io) {
   this.rooms = new Map();
   this.socket_to_room_name = new Map();
 
-  this.rooms.set("default", new Room("default", io.to("default")));
+  this.rooms.set("default", new Room(io, "default"));
 
   var self = this;
   io.on('connection', function(socket) {
@@ -76,14 +84,14 @@ RoomManager.prototype.joinOrCreateRoom = function(socket, room_name) {
     
     if (prevRoom.isEmpty() && prevRoom.name !== "default") {
       prevRoom.tearDown();
-      this.rooms.delete(prevRoom);
+      this.rooms.delete(prevRoom.name);
     }
   }
 
   // Get or Create room if it doesn't exist
   var room = this.rooms.get(room_name);
   if (!room) {
-    room = new Room(room_name, this.io.to(room_name));
+    room = new Room(this.io, room_name);
     this.rooms.set(room_name, room);
   }
 
