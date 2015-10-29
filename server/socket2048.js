@@ -52,10 +52,24 @@ SocketInputManager.prototype.onLeave = function(socket) {
   delete this.socket_callbacks[socket.id];
 };
 
-SocketInputManager.prototype.changeUsername = function (socket, username) {
-  this.usernames.delete(this.clientsMap.get(socket.id));
-  this.usernames.add(username);
-  this.clientsMap.set(socket.id, username);
+SocketInputManager.prototype.changeUsername = function (socket, data) {
+  username = JSON.parse(data);
+  if (this.usernames.has(username)) {
+    msgData = {
+      msg: "This username is already taken",
+      color: "red",
+    };
+    socket.emit('chatMessage', JSON.stringify(msgData));
+  } else {
+    this.usernames.delete(this.clientsMap.get(socket.id));
+    this.usernames.add(username);
+    msgData = {
+      msg: this.clientsMap.get(socket.id) + " changed username to " + username,
+      color: "black",
+    };
+    this.clientsMap.set(socket.id, username);
+    this.eventEmitter.emit('chatMessage', JSON.stringify(msgData));
+  }
 }
 
 SocketInputManager.prototype.randomUsername = function() {
@@ -99,7 +113,8 @@ SocketInputManager.prototype.onMove = function(socket, data) {
   }
 };
 
-SocketInputManager.prototype.onChatMessage = function(socket, msg) {
+SocketInputManager.prototype.onChatMessage = function(socket, data) {
+  var msg = JSON.parse(data);
   var trimMsg = msg.trim().toLowerCase();
   //check if the message is a move command
   switch (trimMsg) {  
@@ -116,32 +131,11 @@ SocketInputManager.prototype.onChatMessage = function(socket, msg) {
       this.eventEmitter.emit('move', core.Direction.RIGHT);
       break;
   }
-  var msgData = null;
-  //if message is in the format "nick new_username" -> change username
-  if(trimMsg.indexOf("nick") === 0) { //begins with nick
-    var strArray = trimMsg.split(/\s+/);
-    if (strArray.length === 2) {
-      var newUsername = strArray[1];
-      if (this.usernames.has(newUsername)) {
-        msgData = {
-          msg: "this username is already taken",
-          color: "red",
-        }
-      } else {
-        msgData = {
-          msg: this.clientsMap.get(socket.id) + " changed username to " + newUsername,
-          color: "black",
-        };
-        this.changeUsername(socket, newUsername);
-      }
-    }
-  }
-  if (!msgData) {
-    msgData = {
-      msg: msg,
-      username: this.clientsMap.get(socket.id),
-    };
-  }
+  var msgData = {
+    msg: msg,
+    username: this.clientsMap.get(socket.id),
+  };
+  
   this.eventEmitter.emit('chatMessage', JSON.stringify(msgData));
 };
 

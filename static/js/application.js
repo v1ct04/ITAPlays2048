@@ -9,18 +9,6 @@ remoteStorage.onReady(function(s) {
   window.requestAnimationFrame(function() {
     new GameManager(4, InputManager, HTMLActuator, StorageManager);
 
-    var keyboardInput = new KeyboardInputManager();
-    keyboardInput.on('move', function(dir) {
-      socket.emit('move', JSON.stringify(dir));
-    });
-    keyboardInput.on('restart', function() {
-      socket.emit('restart');
-    });
-    keyboardInput.on('keepPlaying', function() {
-      socket.emit('keepPlaying');
-    });
-    keyboardInput.on('chatMessage', function(msg) {
-      socket.emit('chatMessage', msg);
-    });
+    var keyboardInput = new KeyboardInputManager(socket);
   })
 });

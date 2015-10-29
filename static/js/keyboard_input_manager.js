@@ -1,5 +1,6 @@
-function KeyboardInputManager() {
+function KeyboardInputManager(socket) {
   this.events = {};
+  this.socket = socket;
 
   if (window.navigator.msPointerEnabled) {
     //Internet Explorer 10 style
@@ -32,6 +33,9 @@ KeyboardInputManager.prototype.emit = function (event, data) {
       callback(data);
     });
   }
+  if(this.socket) {
+    this.socket.emit(event, JSON.stringify(data));
+  }
 };
 
 KeyboardInputManager.prototype.listen = function () {
@@ -42,15 +46,6 @@ KeyboardInputManager.prototype.listen = function () {
     39: 1, // Right
     40: 2, // Down
     37: 3, // Left
-    
-    // 75: 0, // Vim up
-    // 76: 1, // Vim right
-    // 74: 2, // Vim down
-    // 72: 3, // Vim left
-    // 87: 0, // W
-    // 68: 1, // D
-    // 83: 2, // S
-    // 65: 3  // A
   };
 
   // Respond to direction keys
@@ -131,15 +126,6 @@ KeyboardInputManager.prototype.listen = function () {
   });
 };
 
-KeyboardInputManager.prototype.chatMessage = function (event) {
-  event.preventDefault();
-  var msg = this.chatInput.value;
-  if (msg !== "") {
-    this.chatInput.value = "";
-    this.emit("chatMessage", msg);    
-  }  
-};
-
 KeyboardInputManager.prototype.restart = function (event) {
   event.preventDefault();
   this.emit("restart");
@@ -155,3 +141,49 @@ KeyboardInputManager.prototype.bindButtonPress = function (selector, fn) {
   button.addEventListener("click", fn.bind(this));
   button.addEventListener(this.eventTouchend, fn.bind(this));
 };
+
+KeyboardInputManager.prototype.chatMessage = function (event) {
+  event.preventDefault();
+  var input = document.querySelector(".input-message");
+  var msg = input.value;
+  if (msg !== "") {
+    input.value = "";
+    var trimMsg = msg.trim().toLowerCase();
+    var strArray = trimMsg.split(/\s+/);
+    var args = []
+    for (var i = 1; i < strArray.length; i++) {
+      args.push(strArray[i]);
+    }
+    var isCommand = this.parseChatMessage(strArray[0], args);
+    if (!isCommand) {
+      this.emit("chatMessage", msg);
+    }
+  }
+};
+
+KeyboardInputManager.prototype.parseChatMessage = function(command, args) {
+  var isCommand = false;
+  switch(command) {
+    case "nick": {
+      if(args.length === 1) {
+        isCommand = true;
+        this.emit("changeUsername", args[0]);
+      }
+    } break;
+
+    case "room": {
+      if(args.length === 1) {
+        isCommand = true;
+        this.emit("joinRoom", args[0]);
+      }
+    } break;
+
+    case "list_room": {
+      if(args.length === 0) {
+        isCommand = true;
+        this.emit("listRooms");
+      }
+    } break;
+  }
+  return isCommand;
+}
