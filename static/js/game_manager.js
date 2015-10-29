@@ -10,13 +10,8 @@ function GameManager(size, InputManager, Actuator, StorageManager) {
   this.inputManager.on("restart", this.restart.bind(this));
   this.inputManager.on("keepPlaying", this.keepPlaying.bind(this));
   this.inputManager.on("chatMessage", this.chatMessage.bind(this));
-  this.inputManager.on("changeUsername", this.changeUsername.bind(this));
   this.setup();
 }
-
-GameManager.prototype.changeUsername = function (data) {
-  this.inputManager.onChangeUsername(data);
-} 
 
 // Chat Message
 GameManager.prototype.chatMessage = function (data) {

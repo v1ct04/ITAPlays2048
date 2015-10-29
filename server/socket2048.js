@@ -39,11 +39,10 @@ SocketInputManager.prototype.listen = function(io) {
   });
 };
 
-SocketInputManager.prototype.onChangeUsername = function (data) {
-  var usernameData = JSON.parse(data);
-  this.usernames.delete(this.clientsMap.get(usernameData.socketID));
-  this.usernames.add(usernameData.newUsername);
-  this.clientsMap.set(usernameData.socketID, usernameData.newUsername); 
+SocketInputManager.prototype.changeUsername = function (socket, username) {
+  this.usernames.delete(this.clientsMap.get(socket.id));
+  this.usernames.add(username);
+  this.clientsMap.set(socket.id, username);
 }
 
 SocketInputManager.prototype.randomUsername = function() {
@@ -113,11 +112,7 @@ SocketInputManager.prototype.onChatMessage = function(socket, msg) {
       msgData = {
         msg: this.clientsMap.get(socket.id) + " changed username to " + newUsername,
       };
-      var usernameData = {
-        socketID: socket.id,
-        newUsername: newUsername,
-      };
-      this.eventEmitter.emit('changeUsername', JSON.stringify(usernameData));
+      this.changeUsername(socket, newUsername);
     }
   }
   if (!msgData) {
