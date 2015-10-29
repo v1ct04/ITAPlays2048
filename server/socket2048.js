@@ -81,7 +81,7 @@ SocketInputManager.prototype.onMove = function(socket, data) {
         msg: msg,
         username: this.clientsMap.get(socket.id),
       }
-      this.io.emit('chatMessage', JSON.stringify(data));
+      this.eventEmitter.emit('chatMessage', JSON.stringify(data));
     }
   }
 };
