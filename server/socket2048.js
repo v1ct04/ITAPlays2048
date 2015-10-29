@@ -109,10 +109,18 @@ SocketInputManager.prototype.onChatMessage = function(socket, msg) {
     var strArray = trimMsg.split(/\s+/);
     if (strArray.length === 2) {
       var newUsername = strArray[1];
-      msgData = {
-        msg: this.clientsMap.get(socket.id) + " changed username to " + newUsername,
-      };
-      this.changeUsername(socket, newUsername);
+      if (this.usernames.has(newUsername)) {
+        msgData = {
+          msg: "this username is already taken",
+          color: "red",
+        }
+      } else {
+        msgData = {
+          msg: this.clientsMap.get(socket.id) + " changed username to " + newUsername,
+          color: "black",
+        };
+        this.changeUsername(socket, newUsername);
+      }
     }
   }
   if (!msgData) {

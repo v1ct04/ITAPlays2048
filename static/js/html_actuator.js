@@ -159,7 +159,7 @@ HTMLActuator.prototype.addChatMessage = function(data) {
     message.appendChild(span);   
     message.appendChild(document.createTextNode(m.msg));
   } else { //message from server
-    span.style.color = "black";
+    span.style.color = m.color;
     span.appendChild(document.createTextNode(m.msg));
     message.appendChild(span);
   }
@@ -168,4 +168,5 @@ HTMLActuator.prototype.addChatMessage = function(data) {
     //scroll messages
     this.chatContainer.scrollTop = this.chatContainer.scrollHeight;
   }
-}
+};
+
