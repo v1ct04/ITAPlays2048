@@ -33,6 +33,9 @@ SocketInputManager.prototype.onJoin = function(socket) {
   callbacks.set('chatMessage', function(data) {
     self.onChatMessage(socket, data);
   });
+  callbacks.set('changeUsername', function(data) {
+    self.changeUsername(socket, data);
+  });
 
   for (var entry of callbacks) {
     socket.on(entry[0], entry[1]);

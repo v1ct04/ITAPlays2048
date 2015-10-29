@@ -14,8 +14,6 @@ function KeyboardInputManager(socket) {
   }
 
   this.chatInput = document.querySelector("#chat-input");
-  console.log(this.chatInput);
-
   this.listen();
 }
 
@@ -144,10 +142,9 @@ KeyboardInputManager.prototype.bindButtonPress = function (selector, fn) {
 
 KeyboardInputManager.prototype.chatMessage = function (event) {
   event.preventDefault();
-  var input = document.querySelector(".input-message");
-  var msg = input.value;
+  var msg = this.chatInput.value;
   if (msg !== "") {
-    input.value = "";
+    this.chatInput.value = "";
     var trimMsg = msg.trim().toLowerCase();
     var strArray = trimMsg.split(/\s+/);
     var args = []
