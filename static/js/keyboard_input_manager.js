@@ -129,7 +129,6 @@ KeyboardInputManager.prototype.listen = function () {
   });
 };
 
-
 KeyboardInputManager.prototype.chatMessage = function (event) {
   event.preventDefault();
   var input = document.querySelector(".input-message");
@@ -149,7 +148,6 @@ KeyboardInputManager.prototype.keepPlaying = function (event) {
   event.preventDefault();
   this.emit("keepPlaying");
 };
-
 
 KeyboardInputManager.prototype.bindButtonPress = function (selector, fn) {
   var button = document.querySelector(selector);

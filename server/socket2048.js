@@ -29,7 +29,7 @@ SocketInputManager.prototype.listen = function(io) {
     socket.on('restart', function() {
       self.eventEmitter.emit('restart');
     });
-    socket.on('chatMessage', function(data){
+    socket.on('chatMessage', function(data) {
       self.onChatMessage(socket, data);
     });
     socket.on('disconnect', function(){
@@ -39,10 +39,11 @@ SocketInputManager.prototype.listen = function(io) {
   });
 };
 
-SocketInputManager.prototype.changeUsername = function(socket, newUsername) {
-  this.usernames.delete(this.clientsMap.get(socket.id));
-  this.usernames.add(newUsername);
-  this.clientsMap.set(socket.id, newUsername);
+SocketInputManager.prototype.onChangeUsername = function (data) {
+  var usernameData = JSON.parse(data);
+  usernames.delete(clientsMap.get(usernameData.socketID));
+  usernames.add(usernameData.newUsername);
+  clientsMap.set(usernameData.socketID, usernameData.newUsername); 
 }
 
 SocketInputManager.prototype.randomUsername = function() {
@@ -103,25 +104,29 @@ SocketInputManager.prototype.onChatMessage = function(socket, msg) {
       this.eventEmitter.emit('move', core.Direction.RIGHT);
       break;
   }
-  var data = null;
+  var msgData = null;
   //if message is in the format "nick new_username" -> change username
   if(trimMsg.indexOf("nick") === 0) { //begins with nick
     var strArray = trimMsg.split(/\s+/);
     if (strArray.length === 2) {
       var newUsername = strArray[1];
-      var data = {
+      msgData = {
         msg: this.clientsMap.get(socket.id) + " changed username to " + newUsername,
       };
-      this.changeUsername(socket, newUsername);
+      var usernameData = {
+        socketID: socket.id,
+        newUsername: newUsername,
+      };
+      this.eventEmitter.emit('changeUsername', JSON.stringify(usernameData));
     }
   }
-  if (!data) {
-    data = {
+  if (!msgData) {
+    msgData = {
       msg: msg,
       username: this.clientsMap.get(socket.id),
     };
   }
-  this.eventEmitter.emit('chatMessage', JSON.stringify(data));
+  this.eventEmitter.emit('chatMessage', JSON.stringify(msgData));
 };
 
 var MemoryStorageManager = function(io) {

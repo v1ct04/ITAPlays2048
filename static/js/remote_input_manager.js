@@ -40,4 +40,8 @@ RemoteInputManager.prototype.listen = function (socket) {
   socket.on('chatMessage', function(data) {
     self.emit('chatMessage', data);
   });
+  socket.on('changeUsername', function(data) {
+    console.log("change username RemoteInputManager");
+    self.emit('changeUsername', data);
+  });
 };
