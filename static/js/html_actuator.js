@@ -156,6 +156,7 @@ HTMLActuator.prototype.addChatMessage = function(data) {
   var span = document.createElement("span");
   if (m.username) {
     span.appendChild(document.createTextNode(m.username + ": "));
+    span.style["font-weight"] = "bold";
     message.appendChild(span);   
     message.appendChild(document.createTextNode(m.msg));
   } else { //message from server

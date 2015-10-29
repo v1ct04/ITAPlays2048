@@ -12,6 +12,9 @@ function KeyboardInputManager() {
     this.eventTouchend      = "touchend";
   }
 
+  this.chatInput = document.querySelector("#chat-input");
+  console.log(this.chatInput);
+
   this.listen();
 }
 
@@ -56,16 +59,16 @@ KeyboardInputManager.prototype.listen = function () {
                     event.shiftKey;
     var mapped    = map[event.which];
 
-    if (!modifiers) {
-      if (mapped !== undefined) {
-        event.preventDefault();
-        self.emit("move", mapped);
-      }
+    if (!modifiers && mapped !== undefined && document.activeElement !== self.chatInput) {
+      event.preventDefault();
+      self.emit("move", mapped);
+    } else {
+      self.chatInput.focus();
     }
 
     // Enter Key sends message from chat
     if(!modifiers && event.which === 13) {
-      self.chatMessage.call(self, event);
+      self.chatMessage(event);
     }
   });
 
@@ -130,10 +133,9 @@ KeyboardInputManager.prototype.listen = function () {
 
 KeyboardInputManager.prototype.chatMessage = function (event) {
   event.preventDefault();
-  var input = document.querySelector(".input-message");
-  var msg = input.value;
+  var msg = this.chatInput.value;
   if (msg !== "") {
-    input.value = "";
+    this.chatInput.value = "";
     this.emit("chatMessage", msg);    
   }  
 };
