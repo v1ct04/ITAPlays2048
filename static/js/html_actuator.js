@@ -3,8 +3,20 @@ function HTMLActuator() {
   this.scoreContainer   = document.querySelector(".score-container");
   this.bestContainer    = document.querySelector(".best-container");
   this.messageContainer = document.querySelector(".game-message");
-  this.chatContainer = document.querySelector(".media-list");
+  this.chatList = document.querySelector(".chat-list");
+  this.chatContainer = document.querySelector(".chat-container");
   this.score = 0;
+
+  // set up the scroll toggle 
+  var self = this;
+  self.chatContainer.dataset.autoScroll = "true";
+  self.chatContainer.addEventListener("scroll", function(evt) {
+    self.chatContainer.dataset.autoScroll = "false";
+    // if scroll at bottom 
+    if(self.chatContainer.scrollTop >= self.chatContainer.scrollHeight - self.chatContainer.offsetHeight - 5) {
+      self.chatContainer.dataset.autoScroll = "true";
+    }
+  });
 }
 
 HTMLActuator.prototype.actuate = function (grid, metadata) {
@@ -31,7 +43,6 @@ HTMLActuator.prototype.actuate = function (grid, metadata) {
         self.message(true); // You win!
       }
     }
-
   });
 };
 
@@ -152,5 +163,9 @@ HTMLActuator.prototype.addChatMessage = function(data) {
     span.appendChild(document.createTextNode(m.msg));
     message.appendChild(span);
   }
-  this.chatContainer.appendChild(message);
+  this.chatList.appendChild(message);
+  if (this.chatContainer.dataset.autoScroll == "true") {
+    //scroll messages
+    this.chatContainer.scrollTop = this.chatContainer.scrollHeight;
+  }
 }

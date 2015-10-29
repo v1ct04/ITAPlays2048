@@ -35,7 +35,6 @@ RemoteInputManager.prototype.listen = function (socket) {
     self.emit('keepPlaying');
   });
   socket.on('restart', function(gameState) {
-    console.log(gameState);
     self.emit('restart', JSON.parse(gameState));
   });
   socket.on('chatMessage', function(data) {
