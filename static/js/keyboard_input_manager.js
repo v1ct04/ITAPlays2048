@@ -178,7 +178,7 @@ KeyboardInputManager.prototype.parseChatMessage = function(command, args) {
       }
     } break;
 
-    case "list_room": {
+    case "list_rooms": {
       if(args.length === 0) {
         isCommand = true;
         this.emit("listRooms");
