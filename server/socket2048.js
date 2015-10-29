@@ -6,37 +6,50 @@ var SocketInputManager = function(io) {
   this.eventEmitter = new events.EventEmitter();
   this.clientsMap = new Map();
   this.usernames = new Set();
-
-  this.listen(io);
+  this.socket_callbacks = {};
 }
 
 SocketInputManager.prototype.on = function(evt, callback) {
   this.eventEmitter.on(evt, callback);
 }
 
-SocketInputManager.prototype.listen = function(io) {
-  var self = this;
-  io.on('connection', function(socket) {
-    self.clientsMap.set(socket.id, self.randomUsername());
+SocketInputManager.prototype.onJoin = function(socket) {
+  console.log(socket.id + " joining");
+  this.clientsMap.set(socket.id, this.randomUsername());
+  
+  var callbacks = new Map();
 
-    socket.on('move', function(data) {
-      self.onMove(socket, data);
-    });
-    socket.on('keepPlaying', function() {
-      self.eventEmitter.emit('keepPlaying');
-      self.io.emit('keepPlaying');
-    });
-    socket.on('restart', function() {
-      self.eventEmitter.emit('restart');
-    });
-    socket.on('chatMessage', function(data) {
-      self.onChatMessage(socket, data);
-    });
-    socket.on('disconnect', function(){
-      self.usernames.delete(self.clientsMap.get(socket.id));
-      self.clientsMap.delete(socket.id);
-    });
+  var self = this;
+  callbacks.set('move', function(data) {
+    self.onMove(socket, data);
   });
+  callbacks.set('keepPlaying', function() {
+    self.eventEmitter.emit('keepPlaying');
+    self.io.emit('keepPlaying');
+  });
+  callbacks.set('restart', function() {
+    self.eventEmitter.emit('restart');
+  });
+  callbacks.set('chatMessage', function(data) {
+    self.onChatMessage(socket, data);
+  });
+
+  for (var entry of callbacks) {
+    socket.on(entry[0], entry[1]);
+  }
+  this.socket_callbacks[socket.id] = callbacks;
+};
+
+SocketInputManager.prototype.onLeave = function(socket) {
+  console.log(socket.id + " leaving");
+  this.usernames.delete(this.clientsMap.get(socket.id));
+  this.clientsMap.delete(socket.id);
+
+  var callbacks = this.socket_callbacks[socket.id];
+  for (var entry of callbacks) {
+    socket.removeListener(entry[0], entry[1]);
+  }
+  delete this.socket_callbacks[socket.id];
 };
 
 SocketInputManager.prototype.changeUsername = function (socket, username) {
@@ -136,8 +149,6 @@ var MemoryStorageManager = function(io) {
   this.gameState = null;
   this.bestScore = 0;
   this.io = io;
-
-  this.listen(io);
 };
 
 MemoryStorageManager.prototype = {
@@ -147,13 +158,12 @@ MemoryStorageManager.prototype = {
   clearGameState: function() {this.gameState = null;}
 };
 
-MemoryStorageManager.prototype.listen = function(io) {
-  var self = this;
-  io.on('connection', function(socket) {
-    socket.emit('gameState', JSON.stringify(self.gameState));
-    socket.emit('bestScore', JSON.stringify(self.bestScore));
-  });
+MemoryStorageManager.prototype.onJoin = function(socket) {
+  socket.emit('gameState', JSON.stringify(this.gameState));
+  socket.emit('bestScore', JSON.stringify(this.bestScore));
 };
+
+MemoryStorageManager.prototype.onLeave = function(socket) {};
 
 MemoryStorageManager.prototype.setGameState = function(state) {
   if (this.gameState == null) {
@@ -184,9 +194,7 @@ Actuator.prototype.addChatMessage = function(data) {
   this.io.emit("chatMessage", data);
 }
 
-module.exports = function(http) {
-  var io = require('socket.io')(http);
-
+module.exports = function(io) {
   return {
     inputManager: SocketInputManager.bind(null, io),
     storageManager: MemoryStorageManager.bind(null, io),

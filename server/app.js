@@ -16,11 +16,10 @@ app.get('/', function(req, res) {
 });
 
 var http = require('http').Server(app);
-var socket2048 = require('./socket2048.js')(http);
-var core2048 = require('./core2048.js');
+var io = require('socket.io')(http);
 
 http.listen(port, function() {
   console.log('Listening on port ' + port + '.');
 
-  new core2048.GameManager(4, socket2048.inputManager, socket2048.actuator, socket2048.storageManager);
+  require('./room_manager.js')(io);
 });
