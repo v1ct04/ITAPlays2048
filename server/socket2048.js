@@ -41,9 +41,9 @@ SocketInputManager.prototype.listen = function(io) {
 
 SocketInputManager.prototype.onChangeUsername = function (data) {
   var usernameData = JSON.parse(data);
-  usernames.delete(clientsMap.get(usernameData.socketID));
-  usernames.add(usernameData.newUsername);
-  clientsMap.set(usernameData.socketID, usernameData.newUsername); 
+  this.usernames.delete(this.clientsMap.get(usernameData.socketID));
+  this.usernames.add(usernameData.newUsername);
+  this.clientsMap.set(usernameData.socketID, usernameData.newUsername); 
 }
 
 SocketInputManager.prototype.randomUsername = function() {
