@@ -14,7 +14,6 @@ SocketInputManager.prototype.on = function(evt, callback) {
 }
 
 SocketInputManager.prototype.onJoin = function(socket) {
-  console.log(socket.id + " joining");
   this.clientsMap.set(socket.id, this.randomUsername());
   
   var callbacks = new Map();
@@ -44,7 +43,6 @@ SocketInputManager.prototype.onJoin = function(socket) {
 };
 
 SocketInputManager.prototype.onLeave = function(socket) {
-  console.log(socket.id + " leaving");
   this.usernames.delete(this.clientsMap.get(socket.id));
   this.clientsMap.delete(socket.id);
 
