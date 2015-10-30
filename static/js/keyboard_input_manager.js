@@ -164,36 +164,42 @@ KeyboardInputManager.prototype.chatMessage = function (event) {
 };
 
 KeyboardInputManager.prototype.handleCommand = function(command, args) {
-  var isCommand = false;
   switch(command) {
-    case "nick": {
+    case "nick":
       if(args.length === 1) {
-        isCommand = true;
         data = {
           username: args[0],
           automatic: false,
         };
         this.emit("changeUsername", data);
+        return true;
       }
-    } break;
+      break;
 
-    case "room": {
+    case "room":
       if(args.length === 1) {
-        isCommand = true;
         var data = {room: args[0]};
         var nick = windowStorage().getItem("nickname");
         if (nick) data.username = nick;
 
         this.emit("room", data);
+        return true;
       }
-    } break;
+      break;
 
-    case "list_rooms": {
+    case "list_rooms":
       if(args.length === 0) {
-        isCommand = true;
         this.emit("listRooms");
+        return true;
       }
-    } break;
+      break;
+
+    case "list_users":
+      if(args.length === 0) {
+        this.emit("listUsers");
+        return true;
+      }
+      break;
   }
-  return isCommand;
+  return false;
 }

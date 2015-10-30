@@ -92,6 +92,18 @@ function RoomManager(io) {
       };
       socket.emit('chatMessage', JSON.stringify(data));
     });
+    socket.on('listUsers', function() {
+      var room = self.socketRoom(socket);
+      var socketList = Array.from(room.sockets);
+      var userListStr = socketList
+              .filter(function(s) {return s != socket;})
+              .map(function(s) {return room.getUsername(s);})
+              .join(", ");
+      var data = {
+        msg: "Other users in this room: " + userListStr
+      }
+      socket.emit('chatMessage', JSON.stringify(data));
+    });
     socket.on('disconnect', function() {
       var room = self.socketRoom(socket);
       if (room) self.leaveRoom(socket, room);
