@@ -5,6 +5,7 @@ function HTMLActuator() {
   this.messageContainer = document.querySelector(".game-message");
   this.chatList = document.querySelector(".chat-list");
   this.chatContainer = document.querySelector(".chat-container");
+  this.roomName = document.getElementById("room-name");
   this.score = 0;
 
   // set up the scroll toggle 
@@ -173,6 +174,11 @@ HTMLActuator.prototype.addChatMessage = function(data) {
     //scroll messages
     this.chatContainer.scrollTop = this.chatContainer.scrollHeight;
   }
+};
+
+HTMLActuator.prototype.joinRoom = function (room) {
+  this.roomName.innerText = "Room: " + room;
+  this.restartChat();
 };
 
 HTMLActuator.prototype.restartChat = function() {

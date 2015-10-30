@@ -176,7 +176,6 @@ MemoryStorageManager.prototype.onJoin = function(socket) {
     bestScore: this.bestScore,
   };
   socket.emit('gameState', JSON.stringify(data));
-  socket.emit('restartChat');
 };
 
 MemoryStorageManager.prototype.onLeave = function(socket) {};

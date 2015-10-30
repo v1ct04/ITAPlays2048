@@ -11,12 +11,12 @@ function GameManager(size, InputManager, Actuator, StorageManager) {
   this.inputManager.on("keepPlaying", this.keepPlaying.bind(this));
   this.inputManager.on("chatMessage", this.chatMessage.bind(this));
   this.inputManager.on("invalidUsername", this.invalidUsername.bind(this));
-  this.inputManager.on("restartChat", this.restartChat.bind(this));
+  this.inputManager.on("joinRoom", this.joinRoom.bind(this));
   this.setup();
 }
 
-GameManager.prototype.restartChat = function() {
-  this.actuator.restartChat();
+GameManager.prototype.joinRoom = function(data) {
+  this.actuator.joinRoom(data);
 }
 
 GameManager.prototype.invalidUsername = function () {

@@ -35,6 +35,7 @@ Room.prototype.join = function(socket) {
 
   this.game.storageManager.onJoin(socket);
   this.game.inputManager.onJoin(socket);
+  socket.emit("joinRoom", this.name);
 }
 
 Room.prototype.leave = function(socket) {
