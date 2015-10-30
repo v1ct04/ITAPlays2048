@@ -177,7 +177,7 @@ HTMLActuator.prototype.addChatMessage = function(data) {
 };
 
 HTMLActuator.prototype.joinRoom = function (room) {
-  this.roomName.innerHTML = "Room: <b>" + room + "</b>";
+  this.roomName.innerText = room;
   this.restartChat();
 };
 
