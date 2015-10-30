@@ -18,15 +18,7 @@ window.fakeStorage = {
   }
 };
 
-function LocalStorageManager() {
-  this.bestScoreKey     = "bestScore";
-  this.gameStateKey     = "gameState";
-
-  var supported = this.localStorageSupported();
-  this.storage = supported ? window.localStorage : window.fakeStorage;
-}
-
-LocalStorageManager.prototype.localStorageSupported = function () {
+function localStorageSupported() {
   var testKey = "test";
   var storage = window.localStorage;
 
@@ -38,6 +30,18 @@ LocalStorageManager.prototype.localStorageSupported = function () {
     return false;
   }
 };
+
+function windowStorage() {
+  var supported = localStorageSupported();
+  return supported ? window.localStorage : window.fakeStorage;
+}
+
+function LocalStorageManager() {
+  this.bestScoreKey     = "bestScore";
+  this.gameStateKey     = "gameState";
+
+  this.storage = windowStorage();
+}
 
 // Best score getters/setters
 LocalStorageManager.prototype.getBestScore = function () {

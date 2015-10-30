@@ -59,14 +59,39 @@ function RoomManager(io) {
     socket.on('room', function(data) {
       var room_name = JSON.parse(data);
       if (typeof(room_name) === "string" && room_name.search("\\s") < 0) {
-        self.joinOrCreateRoom(socket, room_name);
+        var room = self.joinOrCreateRoom(socket, room_name);
+        var msg = self.getJoinedRoomMsg(room);
+        var data = {
+          msg: msg,
+        };
+        socket.emit('chatMessage', JSON.stringify(data));
       }
+    });
+    socket.on('listRooms', function() {
+      var roomList = Array.from(self.rooms.keys());
+      var roomListStr = roomList.join(", ");
+      var data = {
+        msg: "Online rooms: " + roomListStr,
+      };
+      socket.emit('chatMessage', JSON.stringify(data));
     });
     socket.on('disconnect', function() {
       var room = self.socketRoom(socket);
       if (room) self.leaveRoom(socket, room);
     });
   });
+}
+
+RoomManager.prototype.getJoinedRoomMsg= function(room) {
+  var users = room.sockets.size - 1;
+  switch(users) {
+    case 0:
+      return "You created room " + room.name;
+    case 1:
+      return "You joined room " + room.name + ". There is 1 other user in this room";
+    default:
+      return "You joined room " + room.name + ". There are " + users + " other users in this room";
+  }
 }
 
 RoomManager.prototype.socketRoom = function(socket) {
@@ -97,6 +122,7 @@ RoomManager.prototype.joinOrCreateRoom = function(socket, room_name) {
 
   room.join(socket);
   this.socket_to_room_name.set(socket.id, room_name);
+  return room;
 }
 
 RoomManager.prototype.leaveRoom = function(socket, room) {

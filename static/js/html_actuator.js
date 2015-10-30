@@ -160,7 +160,11 @@ HTMLActuator.prototype.addChatMessage = function(data) {
     message.appendChild(span);   
     message.appendChild(document.createTextNode(m.msg));
   } else { //message from server
-    span.style.color = m.color;
+    if (m.color) {
+      span.style.color = m.color;
+    } else {
+      span.style.color = "black";
+    }
     span.appendChild(document.createTextNode(m.msg));
     message.appendChild(span);
   }
@@ -171,3 +175,6 @@ HTMLActuator.prototype.addChatMessage = function(data) {
   }
 };
 
+HTMLActuator.prototype.restartChat = function() {
+  this.chatList.innerHTML = '';
+}

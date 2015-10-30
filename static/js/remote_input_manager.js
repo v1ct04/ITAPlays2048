@@ -40,4 +40,10 @@ RemoteInputManager.prototype.listen = function (socket) {
   socket.on('chatMessage', function(data) {
     self.emit('chatMessage', data);
   });
+  socket.on('restartChat', function() {
+    self.emit('restartChat');
+  });
+  socket.on('saveNickname', function(data) {
+    windowStorage().setItem("nickname", data);
+  });
 };

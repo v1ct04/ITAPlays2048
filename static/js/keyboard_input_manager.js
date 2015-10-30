@@ -164,14 +164,18 @@ KeyboardInputManager.prototype.parseChatMessage = function(command, args) {
     case "nick": {
       if(args.length === 1) {
         isCommand = true;
-        this.emit("changeUsername", args[0]);
+        data = {
+          username: args[0],
+          automatic: false,
+        };
+        this.emit("changeUsername", data);
       }
     } break;
 
     case "room": {
       if(args.length === 1) {
         isCommand = true;
-        this.emit("joinRoom", args[0]);
+        this.emit("room", args[0]);
       }
     } break;
 

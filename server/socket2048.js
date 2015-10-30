@@ -56,22 +56,37 @@ SocketInputManager.prototype.onLeave = function(socket) {
 };
 
 SocketInputManager.prototype.changeUsername = function (socket, data) {
-  username = JSON.parse(data);
-  if (this.usernames.has(username)) {
-    msgData = {
-      msg: "This username is already taken",
-      color: "red",
-    };
-    socket.emit('chatMessage', JSON.stringify(msgData));
+  d = JSON.parse(data);
+  var msgData = null;
+  if (this.usernames.has(d.username)) {
+    if (d.automatic) {
+      var username = this.randomUsername();
+      this.usernames.add(username);
+      this.clientsMap.set(socket.id, username);
+
+      msgData = {
+        msg: "Your username was already taken. Your new username is " + username,
+        color: "red",
+      };
+      socket.emit('chatMessage', JSON.stringify(msgData));
+    } else {
+      msgData = {
+        msg: "This username is already taken",
+        color: "red",
+      };
+      socket.emit('chatMessage', JSON.stringify(msgData));
+    }
   } else {
     this.usernames.delete(this.clientsMap.get(socket.id));
-    this.usernames.add(username);
+    this.usernames.add(d.username);
     msgData = {
-      msg: this.clientsMap.get(socket.id) + " changed username to " + username,
-      color: "black",
+      msg: this.clientsMap.get(socket.id) + " changed username to " + d.username,
     };
-    this.clientsMap.set(socket.id, username);
-    this.eventEmitter.emit('chatMessage', JSON.stringify(msgData));
+    this.clientsMap.set(socket.id, d.username);
+    socket.emit('saveNickname', d.username);
+    if (!d.automatic) {
+      this.eventEmitter.emit('chatMessage', JSON.stringify(msgData));
+    }
   }
 }
 
@@ -156,8 +171,12 @@ MemoryStorageManager.prototype = {
 };
 
 MemoryStorageManager.prototype.onJoin = function(socket) {
-  socket.emit('gameState', JSON.stringify(this.gameState));
-  socket.emit('bestScore', JSON.stringify(this.bestScore));
+  var data = {
+    gameState: this.gameState,
+    bestScore: this.bestScore,
+  };
+  socket.emit('gameState', JSON.stringify(data));
+  socket.emit('restartChat');
 };
 
 MemoryStorageManager.prototype.onLeave = function(socket) {};
