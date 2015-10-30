@@ -153,7 +153,7 @@ HTMLActuator.prototype.clearMessage = function () {
 HTMLActuator.prototype.addChatMessage = function(data) {
   var m = JSON.parse(data);
   var message = document.createElement("li");
-  message.setAttribute('class','media-list');
+  message.setAttribute('class','media-list word-wrap');
   var span = document.createElement("span");
   if (m.username) {
     span.appendChild(document.createTextNode(m.username + ": "));
