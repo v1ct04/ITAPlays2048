@@ -38,6 +38,18 @@ Room.prototype.join = function(socket) {
   socket.emit("joinRoom", this.name);
 }
 
+Room.prototype.setUsername = function(socket, name) {
+  if (!this.sockets.has(socket)) throw "Socket not in room";
+
+  var data = {username: name, automatic: true};
+  this.game.inputManager.changeUsername(socket, JSON.stringify(data));
+}
+
+Room.prototype.getUsername = function(socket) {
+  if (!this.sockets.has(socket)) throw "Socket not in room";
+  return this.game.inputManager.getUsername(socket);
+}
+
 Room.prototype.leave = function(socket) {
   if (!this.sockets.has(socket)) throw "Socket not in room";
   this.sockets.delete(socket);
@@ -55,17 +67,21 @@ function RoomManager(io) {
 
   var self = this;
   io.on('connection', function(socket) {
-    self.joinOrCreateRoom(socket, "default");
+    // user will sent message to join default room
+    socket.on('room', function(data_s) {
+      var data = JSON.parse(data_s);
+      if (typeof(data.room) === "string" && data.room.search("\\s") < 0) {
+        var room = self.joinOrCreateRoom(socket, data.room);
+        if (!room) return;
+        if (data.username) room.setUsername(socket, data.username);
 
-    socket.on('room', function(data) {
-      var room_name = JSON.parse(data);
-      if (typeof(room_name) === "string" && room_name.search("\\s") < 0) {
-        var room = self.joinOrCreateRoom(socket, room_name);
-        var msg = self.getJoinedRoomMsg(room);
         var data = {
-          msg: msg,
+          msg: self.getJoinedRoomMsg(room),
         };
         socket.emit('chatMessage', JSON.stringify(data));
+
+        data.msg = room.getUsername(socket) + " just joined the room.";
+        socket.broadcast.to(room.name).emit('chatMessage', JSON.stringify(data));
       }
     });
     socket.on('listRooms', function() {
@@ -85,13 +101,21 @@ function RoomManager(io) {
 
 RoomManager.prototype.getJoinedRoomMsg= function(room) {
   var users = room.sockets.size - 1;
+
+  var room_id = "room " + room.name;
+  if (room.name === "default") room_id = "the default room";
+
   switch(users) {
     case 0:
-      return "You created room " + room.name;
+      if (room.name === "default") {
+        return "You just joined the default room.";
+      } else {
+        return "You created room " + room.name;
+      }
     case 1:
-      return "You joined room " + room.name + ". There is 1 other user in this room";
+      return "You joined " + room_id + ". There is 1 other user in this room";
     default:
-      return "You joined room " + room.name + ". There are " + users + " other users in this room";
+      return "You joined " + room_id + ". There are " + users + " other users in this room";
   }
 }
 
@@ -106,7 +130,12 @@ RoomManager.prototype.joinOrCreateRoom = function(socket, room_name) {
   var prevRoom = this.socketRoom(socket);
   if (prevRoom) {
     if (prevRoom.name == room_name) return;
+
+    var username = prevRoom.getUsername(socket);
     this.leaveRoom(socket, prevRoom);
+
+    var data = {msg: username + " just left the room."}
+    socket.broadcast.to(prevRoom.name).emit('chatMessage', JSON.stringify(data));
     
     if (prevRoom.isEmpty() && prevRoom.name !== "default") {
       prevRoom.tearDown();

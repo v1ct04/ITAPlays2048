@@ -90,6 +90,10 @@ SocketInputManager.prototype.changeUsername = function (socket, data) {
   }
 }
 
+SocketInputManager.prototype.getUsername = function (socket) {
+  return this.clientsMap.get(socket.id);
+}
+
 SocketInputManager.prototype.randomUsername = function() {
   var max = 2 * this.clientsMap.size;
   do {

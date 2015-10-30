@@ -156,14 +156,14 @@ KeyboardInputManager.prototype.chatMessage = function (event) {
     for (var i = 1; i < strArray.length; i++) {
       args.push(strArray[i]);
     }
-    var isCommand = this.parseChatMessage(strArray[0], args);
+    var isCommand = this.handleCommand(strArray[0], args);
     if (!isCommand) {
       this.emit("chatMessage", msg);
     }
   }
 };
 
-KeyboardInputManager.prototype.parseChatMessage = function(command, args) {
+KeyboardInputManager.prototype.handleCommand = function(command, args) {
   var isCommand = false;
   switch(command) {
     case "nick": {
@@ -180,7 +180,11 @@ KeyboardInputManager.prototype.parseChatMessage = function(command, args) {
     case "room": {
       if(args.length === 1) {
         isCommand = true;
-        this.emit("room", args[0]);
+        var data = {room: args[0]};
+        var nick = windowStorage().getItem("nickname");
+        if (nick) data.username = nick;
+
+        this.emit("room", data);
       }
     } break;
 
