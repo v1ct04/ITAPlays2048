@@ -136,13 +136,8 @@ h1.title {
 .panel-height{
   min-height: 400px;
   max-height: 400px;
-  overflow: scroll;
+  overflow-y: scroll;
   background: rgba(238, 228, 218, 0.35);
-}
-
-.message{
-  height: 100%;
-  overflow: scroll;
 }
 
 .bold-font{
