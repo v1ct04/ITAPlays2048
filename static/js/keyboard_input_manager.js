@@ -63,6 +63,11 @@ KeyboardInputManager.prototype.listen = function () {
     if(!modifiers && event.which === 13) {
       self.chatMessage(event);
     }
+
+    // ESC key unfocus chatInput
+    if(!modifiers && event.which === 27) {
+      self.chatInput.blur();
+    }
   });
 
   // Respond to button presses
