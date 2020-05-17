@@ -19,7 +19,7 @@ var http = require('http').Server(app);
 var io = require('socket.io')(http);
 
 http.listen(port, function() {
-  console.log('Listening on port ' + port + '.');
+  console.log('Listening on port ' + port + ' in ' + app.get('env') + ' mode.')
 
   require('./room_manager.js')(io);
 });
